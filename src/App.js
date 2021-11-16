@@ -1,33 +1,54 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import logo from './logo.png'
-import './App.css';
+import './App.css'
+import Chance from 'chance'
+
+const chance = new Chance()
 
 function Editable({ value, width }) {
-  const [val, setVal] = useState(value);
-  const handleCahnge = (event) => setVal(event.target.value)
-  return (
-    <input value={val} onChange={handleCahnge} style={{width: width+'em'}}/>
-  )
+  const [val, setVal] = useState(value)
+  const handleCahnge = event => setVal(event.target.value)
+  return <input value={val} onChange={handleCahnge} style={{ width: width + 'em' }} />
+}
+
+function NumberFormat(n) {
+  return n.toLocaleString('ru')
 }
 
 function App() {
+  const total = chance.natural({ min: 20000, max: 25000 })
+  const tax = Math.round(0.4123 * total)
+
   const data = {
     name: 'Mrs NAME FAMILY',
     passport: '00 0000000',
-    ticket: '555-5085454000',
-    order: 'JMGABC',
-    orderAt: '11 сентября 2019',
-    pnr: 'WVJSIV',
-    price: '13 649',
-    tax: '9 578',
-    total: '23 227',
+    ticket:
+      chance.natural({ min: 10 ** 2, max: 10 ** 3 - 1 }) + '-' + chance.natural({ min: 10 ** 10, max: 10 ** 11 - 1 }),
+    order: chance.string({ pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', length: 6 }),
+    orderAt: '11 декабря 2019',
+    pnr: chance.string({ pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', length: 5 }),
+    price: NumberFormat(total - tax),
+    tax: NumberFormat(tax),
+    total: NumberFormat(total),
+    flightNumber: 'SU 0271',
+    flightCompany: 'Aeroflot',
+    flightFrom: 'BKK',
+    flightFromCity: 'Бангкок',
+    flightFromAirport: 'Бангкок',
+    flightFromTime: '10:15',
+    flightFromDate: '5 фев 2020',
+    flightTo: 'SVO',
+    flightToCity: 'Москва',
+    flightToAirport: 'Шереметьево',
+    flightToTime: '16:20',
+    flightToDate: '5 фев 2020',
   }
   return (
     <div>
       <table className="table hr">
         <tr>
           <td>
-            <img src={logo} width={180} alt="logo"/>
+            <img src={logo} width={180} alt="logo" />
           </td>
           <td className="title">Маршрутная квитанция</td>
         </tr>
@@ -69,7 +90,9 @@ function App() {
       </table>
       <table className="table flight">
         <tr className="flight-head">
-          <td colSpan={4}>Бангкок — Москва</td>
+          <td colSpan={4}>
+            {data.flightFromCity} — {data.flightToCity}
+          </td>
         </tr>
         <tr className="flight-label">
           <td className="label">Рейс</td>
@@ -79,26 +102,26 @@ function App() {
         </tr>
         <tr>
           <td>
-            SU 0271
+            {data.flightNumber}
             <br />
-            <span className="small">Aeroflot</span>
+            <span className="small">{data.flightCompany}</span>
           </td>
           <td>
-            <span className="flight-head flight-small">BKK</span> 10:15
+            <span className="flight-head flight-small">{data.flightFrom}</span> {data.flightFromTime}
             <br />
-            <span className="small bold">13 янв 2020</span>
+            <span className="small bold">{data.flightFromDate}</span>
             <br />
-            <span className="small">Бангкок</span>
+            <span className="small">{data.flightFromAirport}</span>
           </td>
           <td>
-            <span className="flight-head flight-small">SVO</span> 16:20
+            <span className="flight-head flight-small">{data.flightTo}</span> {data.flightToTime}
             <br />
-            <span className="small bold">13 янв 2020</span>
+            <span className="small bold">{data.flightToDate}</span>
             <br />
-            <span className="small">Шереметьево</span>
+            <span className="small">{data.flightToAirport}</span>
           </td>
           <td>
-            Бронь <Editable value={data.pnr} width={5}/>
+            Бронь <Editable value={data.pnr} width={5} />
             <br />
             <span className="small">Эконом-Бюджет</span>
             <br />
@@ -116,11 +139,17 @@ function App() {
             <table className="price">
               <tr>
                 <td>Тариф</td>
-                <td className="price-sum"><Editable value={data.price} width={5}/>.00 руб.</td>
+                <td className="price-sum">
+                  <Editable value={data.price} width={5} />
+                  .00 руб.
+                </td>
               </tr>
               <tr>
                 <td>Таксы</td>
-                <td className="price-sum"><Editable value={data.tax} width={5}/>.00 руб.</td>
+                <td className="price-sum">
+                  <Editable value={data.tax} width={5} />
+                  .00 руб.
+                </td>
               </tr>
               <tr>
                 <td>
@@ -130,7 +159,10 @@ function App() {
               </tr>
               <tr className="price-total">
                 <td>Итого за билет</td>
-                <td className="price-sum"><Editable value={data.total} width={5}/>.00 руб.</td>
+                <td className="price-sum">
+                  <Editable value={data.total} width={5} />
+                  .00 руб.
+                </td>
               </tr>
             </table>
           </td>
